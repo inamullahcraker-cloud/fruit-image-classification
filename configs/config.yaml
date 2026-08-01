@@ -1,0 +1,70 @@
+dataset:
+  train_dir: data/train
+  val_dir: data/val
+  test_dir: data/test
+  image_size: 224
+  num_workers: 2
+
+training:
+  batch_size: 8
+  epochs: 2
+
+  learning_rate: 0.001
+  weight_decay: 0.0001
+
+  device: auto
+  seed: 42
+
+  loss_name: cross_entropy
+  label_smoothing: 0.1
+
+  lr_step_size: 10
+  lr_gamma: 0.1
+
+  use_amp: true
+
+model:
+  name: resnet18
+  pretrained: true
+  num_classes: 0
+
+loss:
+  name: cross_entropy
+  label_smoothing: 0.1
+
+scheduler:
+  name: cosine
+  step_size: 10
+  gamma: 0.1
+
+checkpoint:
+  save_dir: artifacts/checkpoints
+  save_best_only: true
+  monitor: val_loss
+  mode: min
+
+early_stopping:
+  enabled: true
+  patience: 5
+  monitor: val_loss
+
+logging:
+  log_dir: logs
+  log_level: INFO
+
+experiment:
+  experiment_name: fruit_classification
+  output_dir: artifacts
+
+augmentation:
+  horizontal_flip: true
+  vertical_flip: false
+  random_rotate: true
+  rotation_limit: 20
+  brightness_contrast: true
+  normalize: true
+
+inference:
+  checkpoint_path: artifacts/checkpoints/best_model.pth
+  class_mapping: artifacts/class_to_idx.json
+  confidence_threshold: 0.5

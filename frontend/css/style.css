@@ -1,0 +1,295 @@
+/* ===========================
+   Global Styles
+=========================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Poppins", sans-serif;
+    background: #f4f7fb;
+    color: #222;
+    min-height: 100vh;
+}
+
+/* ===========================
+   Header
+=========================== */
+
+header {
+    width: 100%;
+    background: #ffffff;
+    padding: 18px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+nav {
+    display: flex;
+    gap: 30px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    transition: .3s;
+}
+
+nav a:hover {
+    color: #2e7d32;
+}
+
+/* ===========================
+   Hero
+=========================== */
+
+.hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+}
+
+.hero h1 {
+    font-size: 44px;
+    margin-bottom: 15px;
+    color: #1f2937;
+}
+
+.hero p {
+    max-width: 700px;
+    margin: auto;
+    color: #666;
+    font-size: 18px;
+    line-height: 1.7;
+}
+
+/* ===========================
+   Container
+=========================== */
+
+.container {
+    width: min(1100px, 92%);
+    margin: auto;
+    display: grid;
+    gap: 25px;
+    padding-bottom: 60px;
+}
+
+/* ===========================
+   Card
+=========================== */
+
+.card,
+.result-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+
+.card h2,
+.result-card h2 {
+    margin-bottom: 20px;
+    color: #2e7d32;
+}
+
+/* ===========================
+   Upload Area
+=========================== */
+
+.upload-area {
+    border: 3px dashed #2e7d32;
+    border-radius: 15px;
+    padding: 45px 20px;
+    text-align: center;
+    transition: .3s;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    background: #f3fff3;
+}
+
+.upload-icon {
+    width: 90px;
+    margin-bottom: 15px;
+}
+
+.upload-area p {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.upload-area span {
+    display: block;
+    margin: 12px 0;
+    color: gray;
+}
+
+.upload-btn {
+    display: inline-block;
+    background: #2e7d32;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.upload-btn:hover {
+    background: #1b5e20;
+}
+
+/* ===========================
+   Preview
+=========================== */
+
+.preview-card {
+    text-align: center;
+}
+
+#previewImage {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 12px;
+    display: none;
+    margin: auto;
+    border: 2px solid #ddd;
+}
+
+/* ===========================
+   Button
+=========================== */
+
+#predictBtn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    background: #1565c0;
+    color: white;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+#predictBtn:hover {
+    background: #0d47a1;
+}
+
+/* ===========================
+   Loading
+=========================== */
+
+.loading {
+    display: none;
+    text-align: center;
+}
+
+.spinner {
+    width: 55px;
+    height: 55px;
+    border: 6px solid #ddd;
+    border-top: 6px solid #2e7d32;
+    border-radius: 50%;
+    margin: auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+}
+
+/* ===========================
+   Result
+=========================== */
+
+.result-card {
+    display: none;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #ececec;
+    font-size: 18px;
+}
+
+.result-row:last-child {
+    border-bottom: none;
+}
+
+.result-row strong {
+    color: #1565c0;
+}
+
+/* ===========================
+   Footer
+=========================== */
+
+footer {
+    margin-top: 40px;
+    background: #1f2937;
+    color: white;
+    text-align: center;
+    padding: 22px;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width: 768px) {
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    nav {
+        gap: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hero h1 {
+        font-size: 32px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .upload-area {
+        padding: 35px 15px;
+    }
+
+    .upload-icon {
+        width: 70px;
+    }
+
+    #predictBtn {
+        font-size: 16px;
+    }
+
+}

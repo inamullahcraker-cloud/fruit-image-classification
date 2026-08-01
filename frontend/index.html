@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Image Classification</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+
+        🍎 Fruit AI
+
+    </div>
+
+    <nav>
+
+        <a href="#">Home</a>
+        <a href="#">Prediction</a>
+        <a href="#">About</a>
+
+    </nav>
+
+</header>
+
+
+<section class="hero">
+
+    <h1>
+        Fruit Image Classification
+    </h1>
+
+    <p>
+        Upload a fruit image and let the deep learning model identify
+        the fruit category instantly.
+    </p>
+
+</section>
+
+
+<main class="container">
+
+    <div class="card">
+
+        <h2>
+
+            Upload Image
+
+        </h2>
+
+        <div
+            class="upload-area"
+            id="drop-area"
+        >
+
+            <img
+                src="images/upload.png"
+                alt="Upload"
+                class="upload-icon"
+            >
+
+            <p>
+
+                Drag & Drop Image Here
+
+            </p>
+
+            <span>
+
+                or
+
+            </span>
+
+            <label
+                for="imageInput"
+                class="upload-btn"
+            >
+                Choose Image
+            </label>
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/*"
+                hidden
+            >
+
+        </div>
+
+    </div>
+
+
+
+    <div class="card preview-card">
+
+        <h2>
+
+            Preview
+
+        </h2>
+
+        <img
+            id="previewImage"
+            src=""
+            alt="Preview"
+        >
+
+    </div>
+
+
+
+    <div class="card">
+
+        <button
+            id="predictBtn"
+        >
+            Predict Fruit
+        </button>
+
+    </div>
+
+
+
+    <div
+        class="loading"
+        id="loading"
+    >
+
+        <div class="spinner"></div>
+
+        <p>
+
+            Predicting...
+
+        </p>
+
+    </div>
+
+
+
+    <div
+        class="result-card"
+        id="resultCard"
+    >
+
+        <h2>
+
+            Prediction Result
+
+        </h2>
+
+        <div class="result-row">
+
+            <span>
+
+                Fruit
+
+            </span>
+
+            <strong id="fruitName">
+
+                --
+
+            </strong>
+
+        </div>
+
+        <div class="result-row">
+
+            <span>
+
+                Confidence
+
+            </span>
+
+            <strong id="confidence">
+
+                --
+
+            </strong>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <p>
+
+        © 2026 Fruit Image Classification |
+        Built with PyTorch, FastAPI & Docker
+
+    </p>
+
+</footer>
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
