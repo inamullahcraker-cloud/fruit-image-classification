@@ -1,3 +1,10 @@
+"""
+Predictor class for image inference.
+
+Loads the model and class mapping once and reuses them for
+multiple predictions.
+"""
+
 from __future__ import annotations
 
 import json
@@ -10,128 +17,137 @@ from src.datasets.transforms import get_test_transforms
 from src.models.model_factory import build_model
 
 
-def predict_image(
-    image_path: str | Path,
-    checkpoint_path: str | Path,
-    class_mapping_path: str | Path,
-    model_name: str,
-    image_size: int,
-    device: torch.device,
-    confidence_threshold: float = 0.5,
-) -> dict:
-
-    mapping_path = Path(class_mapping_path)
-
-    with mapping_path.open(
-        "r",
-        encoding="utf-8",
-    ) as f:
-        class_to_idx = json.load(f)
+class Predictor:
     """
-    Predict the class of a single image.
-
-    Parameters
-    ----------
-    image_path : str | Path
-        Path to the input image.
-    checkpoint_path : str | Path
-        Path to the trained model checkpoint.
-    model_name : str
-        Model architecture name.
-    image_size : int
-        Input image size.
-    device : torch.device
-        CPU or CUDA device.
-    confidence_threshold : float, default=0.5
-        Minimum confidence required.
-
-    Returns
-    -------
-    dict
-        Prediction results.
+    Loads a trained model once and performs predictions.
     """
 
-    # --------------------------------------------------
-    # Load class names
-    # -------------------------------------------------
+    def __init__(
+        self,
+        checkpoint_path: str | Path,
+        class_mapping_path: str | Path,
+        model_name: str,
+        image_size: int,
+        device: torch.device,
+        confidence_threshold: float = 0.5,
+    ) -> None:
 
-    idx_to_class = {v: k for k, v in class_to_idx.items()}
+        self.device = device
+        self.image_size = image_size
+        self.confidence_threshold = confidence_threshold
 
-    # --------------------------------------------------
-    # Build model
-    # --------------------------------------------------
-    model = build_model(
-        model_name=model_name,
-        num_classes=len(idx_to_class),
-        pretrained=False,
-    )
+        # -----------------------------
+        # Load class mapping
+        # -----------------------------
 
-    model.load_state_dict(
-        torch.load(
-            checkpoint_path,
-            map_location=device,
-        )
-    )
+        mapping_path = Path(class_mapping_path)
 
-    model.to(device)
-    model.eval()
+        if not mapping_path.exists():
+            raise FileNotFoundError(
+                f"Class mapping not found: {mapping_path}"
+            )
 
-    # --------------------------------------------------
-    # Read image
-    # --------------------------------------------------
-    image = cv2.imread(str(image_path))
+        with mapping_path.open(
+            "r",
+            encoding="utf-8",
+        ) as file:
 
-    if image is None:
-        raise FileNotFoundError(
-            f"Unable to read image: {image_path}"
-        )
+            self.class_to_idx = json.load(file)
 
-    image = cv2.cvtColor(
-        image,
-        cv2.COLOR_BGR2RGB,
-    )
+        self.idx_to_class = {
+            v: k for k, v in self.class_to_idx.items()
+        }
 
-    # --------------------------------------------------
-    # Transform image
-    # --------------------------------------------------
-    transform = get_test_transforms(image_size)
+        # -----------------------------
+        # Build model
+        # -----------------------------
 
-    image = transform(image=image)["image"]
-    image = image.unsqueeze(0).to(device)
-
-    # --------------------------------------------------
-    # Prediction
-    # --------------------------------------------------
-    with torch.no_grad():
-
-        outputs = model(image)
-
-        probabilities = torch.softmax(
-            outputs,
-            dim=1,
+        self.model = build_model(
+            model_name=model_name,
+            num_classes=len(self.idx_to_class),
+            pretrained=False,
         )
 
-        confidence, prediction = torch.max(
-            probabilities,
-            dim=1,
+        checkpoint_path = Path(checkpoint_path)
+
+        if not checkpoint_path.exists():
+            raise FileNotFoundError(
+                f"Checkpoint not found: {checkpoint_path}"
+            )
+
+        self.model.load_state_dict(
+            torch.load(
+                checkpoint_path,
+                map_location=device,
+            )
         )
 
-    confidence = confidence.item()
-    prediction = prediction.item()
+        self.model.to(device)
+        self.model.eval()
 
-    # --------------------------------------------------
-    # Confidence threshold
-    # --------------------------------------------------
-    if confidence < confidence_threshold:
-        predicted_class = "Unknown"
-    else:
-        predicted_class = idx_to_class[prediction]
+        # -----------------------------
+        # Create transform once
+        # -----------------------------
 
-    # --------------------------------------------------
-    # Return prediction
-    # --------------------------------------------------
-    return {
-        "class": predicted_class,
-        "class_index": prediction,
-        "confidence": round(confidence * 100, 2),
-    }
+        self.transform = get_test_transforms(
+            image_size
+        )
+
+    def predict(
+        self,
+        image_path: str | Path,
+    ) -> dict:
+
+        image = cv2.imread(str(image_path))
+
+        if image is None:
+            raise FileNotFoundError(
+                f"Unable to read image: {image_path}"
+            )
+
+        image = cv2.cvtColor(
+            image,
+            cv2.COLOR_BGR2RGB,
+        )
+
+        image = self.transform(
+            image=image
+        )["image"]
+
+        image = image.unsqueeze(0).to(
+            self.device
+        )
+
+        with torch.no_grad():
+
+            outputs = self.model(image)
+
+            probabilities = torch.softmax(
+                outputs,
+                dim=1,
+            )
+
+            confidence, prediction = torch.max(
+                probabilities,
+                dim=1,
+            )
+
+        confidence = confidence.item()
+        prediction = prediction.item()
+
+        if confidence < self.confidence_threshold:
+
+            predicted_class = "Unknown"
+
+        else:
+
+            predicted_class = self.idx_to_class.get(
+                prediction,
+                "Unknown",
+            )
+
+        return {
+            "prediction": predicted_class,
+            "class_index": prediction,
+            "confidence": round(confidence, 4),
+        }

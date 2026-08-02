@@ -10,7 +10,7 @@ from fastapi import UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.config.config import load_config
-from src.inference.predict import predict_image
+from src.inference.predict import Predictor
 from src.utils.device import get_device
 
 app = FastAPI(
@@ -25,7 +25,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+config = load_config("configs/config.yaml")
 
+device = get_device(config.training.device)
+
+predictor = Predictor(
+    checkpoint_path=config.inference.checkpoint_path,
+    class_mapping_path=config.inference.class_mapping,
+    model_name=config.model.name,
+    image_size=config.dataset.image_size,
+    device=device,
+    confidence_threshold=config.inference.confidence_threshold,
+)
 config = load_config("configs/config.yaml")
 
 device = get_device(config.training.device)
@@ -67,15 +78,9 @@ async def predict(
             await file.read()
         )
 
-    prediction = predict_image(
-    image_path=image_path,
-    checkpoint_path=config.inference.checkpoint_path,
-    class_mapping_path=config.inference.class_mapping,
-    model_name=config.model.name,
-    image_size=config.dataset.image_size,
-    device=device,
-    confidence_threshold=config.inference.confidence_threshold,
-    )
+    prediction = predictor.predict(
+    image_path=image_path,)
+
 
     return prediction
 
