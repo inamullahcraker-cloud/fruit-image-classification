@@ -5,20 +5,25 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 
-from src.inference.predict import predict_image
+from src.inference.predict import Predictor
 from src.utils.device import get_device
+from src.config.config import load_config
 
 app = FastAPI(
     title="Fruit Image Classification API",
     version="1.0.0",
 )
 
-MODEL_NAME = "resnet18"
-IMAGE_SIZE = 224
+config=load_config("configs/config.yaml")
+device = get_device(config.training.device,)
+predictions= Predictor(
+        checkpoint_path=config.inference.checkpoint_path,
+        class_mapping_path=config.inference.class_mapping,
+        model_name=config.model.name,
+        image_size=config.dataset.image_size,
+        device=device,
+    )
 
-CHECKPOINT = Path(
-    "artifacts/checkpoints/best_model.pth"
-)
 
 UPLOAD_DIR = Path("artifacts/uploads")
 UPLOAD_DIR.mkdir(
@@ -56,13 +61,7 @@ async def predict(
             buffer,
         )
 
-    result = predict_image(
-        image_path=image_path,
-        checkpoint_path=CHECKPOINT,
-        class_names=CLASS_NAMES,
-        model_name=MODEL_NAME,
-        image_size=IMAGE_SIZE,
-        device=DEVICE,
-    )
+    result = predictions(
+        image_path=image_path)
 
     return result

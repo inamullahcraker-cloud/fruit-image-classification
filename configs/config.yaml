@@ -26,7 +26,7 @@ training:
 model:
   name: resnet34
   pretrained: true
-  num_classes: 0
+  num_classes: 10
 
 loss:
   name: cross_entropy
